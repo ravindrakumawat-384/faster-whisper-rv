@@ -33,6 +33,7 @@ IGNORE_PHRASES = [
     "next video", "see you"
 ]
 
+
 def should_ignore(text: str) -> bool:
     text_lc = text.lower().strip()
     for phrase in IGNORE_PHRASES:
