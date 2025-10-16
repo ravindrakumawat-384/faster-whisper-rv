@@ -9,6 +9,7 @@ import os
 hf_token = os.getenv("HF_TOKEN")
 async def get_speaker_diarization_json(
     audio_file: str,
+    md5: str,
     device: str = "cpu",
     compute_type: str = "int8",
     min_speakers: int = 2,
@@ -22,7 +23,7 @@ async def get_speaker_diarization_json(
     warnings.filterwarnings("ignore", category=UserWarning)
     
     # 1. Check if already processed
-    existing_doc = diarization_collection.find_one({"file": audio_file})
+    existing_doc = diarization_collection.find_one({"md5": md5})
     if existing_doc:
         return existing_doc
     
@@ -85,7 +86,8 @@ async def get_speaker_diarization_json(
         "file": audio_file,
         "duration": duration,
         "speakers": len(speakers),
-        "transcription": output
+        "transcription": output,
+        "md5": md5
     })
     foundDoc = diarization_collection.find_one({"_id": savedDoc.inserted_id })
     if 'speakerMapping' in foundDoc:

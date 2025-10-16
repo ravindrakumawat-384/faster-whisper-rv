@@ -65,10 +65,10 @@ async def diarize_audio(file: UploadFile = File(...)) -> DiarizationResponse:
     logging.info(f"Saving file to {file_path}")
     try:
         # saved_path = f"uploaded_pdfs/{file.filename}"
-        await save_upload_file(file, file_path)
+        md5 =  await save_upload_file(file, file_path)
         # with open(saved_path, "wb") as f:
         #     f.write(await file.read())
-        diarization_text: str = await get_speaker_diarization_json(file_path)
+        diarization_text: str = await get_speaker_diarization_json(file_path, md5)
         logging.info(f"diarization_text: {diarization_text}")
     except Exception as e:
         logging.error(f"Error during file upload or transcription: {e}")
