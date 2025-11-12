@@ -6,12 +6,14 @@ import numpy as np
 import warnings
 from database import insert_with_uuid, diarization_collection
 import os
+import torch
+
 hf_token = os.getenv("HF_TOKEN")
 async def get_speaker_diarization_json(
     audio_file: str,
     md5: str,
-    device: str = "cpu",
-    compute_type: str = "int8",
+    # device: str = "cuda" if torch.cuda.is_available() else "cpu",
+    # compute_type: str = "int8",
     min_speakers: int = 2,
     max_speakers: int = 6,
     # clustering_threshold: float = 0.65,
@@ -19,6 +21,9 @@ async def get_speaker_diarization_json(
     """
     Perform speaker diarization and return segments with speaker, timing, and text in JSON format.
     """
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # choose compute type: float16 on GPU for perf, int8 or float32 for CPU
+    compute_type = "float16" if device == "cuda" else "int8"
     
     warnings.filterwarnings("ignore", category=UserWarning)
     

@@ -2,6 +2,7 @@ from fastapi import UploadFile, File, HTTPException, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
 import os
+import time
 from transcribe import transcribe_audio
 from main import get_speaker_diarization_json
 import logging
@@ -59,6 +60,7 @@ async def upload_audio(file: UploadFile = File(...)) -> Dict[str, str]:
 
 @app.post('/speaker-diarization', response_model=DiarizationResponse)
 async def diarize_audio(file: UploadFile = File(...)) -> DiarizationResponse:
+    start_time = time.time()
     if not file.filename or not file.filename.endswith(".wav") and not file.filename.endswith(".mp3"):
         raise HTTPException(status_code=400, detail="Only WAV and MP3 files are allowed.")
     file_path = os.path.join(UPLOAD_DIR, file.filename)
@@ -73,5 +75,8 @@ async def diarize_audio(file: UploadFile = File(...)) -> DiarizationResponse:
     except Exception as e:
         logging.error(f"Error during file upload or transcription: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    end_time = time.time()  # End timer
+    total_time = end_time - start_time
+    print('total_time:', total_time)
     return diarization_text
 
